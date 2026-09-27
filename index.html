@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leitor Vocal PDF - Leitura em Voz Alta (pt-BR) com Grifo Sincronizado</title>
+  <meta name="description" content="Aplicativo gratuito de estudos com sintetizador de voz em Português do Brasil, visualização híbrida e grifo de texto em tempo real." />
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+<body class="theme-dark">
+  <div id="app-container">
+    <!-- Header Bar -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="brand-icon">
+          <i data-lucide="headphones"></i>
+        </div>
+        <div>
+          <div class="brand-title">
+            Leitor Vocal PDF
+            <span class="badge-tag">pt-BR Gratuito</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Segmented View Mode Tabs -->
+      <nav class="view-mode-tabs" aria-label="Modo de Visualização">
+        <button id="btn-tab-reader" class="tab-btn active" title="Modo focado em leitura com tipografia de livro">
+          <i data-lucide="book-open"></i>
+          <span>Modo Leitura</span>
+        </button>
+        <button id="btn-tab-original" class="tab-btn" title="Visualização original do PDF com diagramação completa">
+          <i data-lucide="file-text"></i>
+          <span>PDF Original</span>
+        </button>
+      </nav>
+
+      <!-- Header Action Buttons & Themes -->
+      <div class="header-actions">
+        <button id="btn-toggle-sidebar" class="action-btn" title="Exibir/Ocultar índice e progresso de páginas">
+          <i data-lucide="sidebar"></i>
+          <span>Sumário</span>
+        </button>
+
+        <button id="btn-upload-file" class="action-btn btn-primary" title="Abrir arquivo PDF do seu computador">
+          <i data-lucide="folder-up"></i>
+          <span>Abrir PDF</span>
+        </button>
+        <input type="file" id="file-input" accept="application/pdf" style="display: none;" />
+
+        <!-- Font Size Controls (Reader Mode) -->
+        <div class="font-size-group" title="Ajustar tamanho da fonte no Modo Leitura">
+          <button id="btn-font-dec" class="font-btn" title="Diminuir fonte">A-</button>
+          <button id="btn-font-inc" class="font-btn" title="Aumentar fonte">A+</button>
+        </div>
+
+        <!-- Theme Selector (Dark, Sepia, Light) -->
+        <div class="theme-picker" title="Escolha o tema para conforto visual">
+          <button class="theme-pill theme-dark-btn active" data-theme="dark" title="Tema Escuro (Noite)"></button>
+          <button class="theme-pill theme-sepia-btn" data-theme="sepia" title="Tema Sépia (Papel de Livro)"></button>
+          <button class="theme-pill theme-light-btn" data-theme="light" title="Tema Claro (Dia)"></button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="main-workspace">
+      <!-- Study Sidebar: Pages, Completion & History -->
+      <aside id="study-sidebar" class="study-sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-title">
+            <i data-lucide="bookmark-check"></i>
+            <span>Progresso de Estudo</span>
+          </div>
+          <button id="btn-resume-reading" class="action-btn" style="padding: 4px 8px; font-size: 0.75rem;" title="Pular direto para a última página lida">
+            Continuar
+          </button>
+        </div>
+
+        <div class="progress-overview">
+          <div class="progress-meta">
+            <span id="progress-text-pages">Páginas lidas: 0 / 0</span>
+            <span id="progress-percent">0%</span>
+          </div>
+          <div class="progress-track">
+            <div id="progress-bar-fill" class="progress-bar-fill"></div>
+          </div>
+        </div>
+
+        <div id="pages-list" class="pages-list">
+          <!-- Populated dynamically with page buttons -->
+        </div>
+      </aside>
+
+      <!-- Viewport Content Area -->
+      <section class="viewport-content" id="viewport-scroll">
+        <!-- View A: Original PDF Mode (Canvas + TextLayer) -->
+        <div id="view-original">
+          <!-- Canvas and text layer are injected dynamically -->
+        </div>
+
+        <!-- View B: Reader Mode (Kindle / Book Typography) -->
+        <div id="view-reader" class="active">
+          <div class="reader-book-container" id="reader-content">
+            <!-- Reader paragraphs with karaoke highlights injected here -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Floating Audio Player Dock (Bottom Bar) -->
+    <footer class="player-dock">
+      <!-- Left: Audio status and equalizer -->
+      <div class="player-left">
+        <div class="voice-status-box">
+          <div id="audio-visualizer" class="audio-visualizer">
+            <div class="audio-bar"></div>
+            <div class="audio-bar"></div>
+            <div class="audio-bar"></div>
+            <div class="audio-bar"></div>
+          </div>
+          <div>
+            <div id="player-title" class="voice-meta-title">Pronto para leitura</div>
+            <div id="player-subtitle" class="voice-meta-sub">Clique em qualquer parágrafo ou pressione Play</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center: Playback Controls -->
+      <div class="player-center">
+        <button id="btn-prev-paragraph" class="ctrl-btn secondary" title="Frase ou parágrafo anterior (Seta Esquerda)">
+          <i data-lucide="skip-back"></i>
+        </button>
+
+        <button id="btn-play-pause" class="ctrl-btn play-btn" title="Iniciar / Pausar leitura (Espaço)">
+          <i data-lucide="play" id="icon-play-state"></i>
+        </button>
+
+        <button id="btn-stop" class="ctrl-btn secondary" title="Parar reprodução">
+          <i data-lucide="square"></i>
+        </button>
+
+        <button id="btn-next-paragraph" class="ctrl-btn secondary" title="Próxima frase ou parágrafo (Seta Direita)">
+          <i data-lucide="skip-forward"></i>
+        </button>
+      </div>
+
+      <!-- Right: Voice & Speed Settings and Page Jump -->
+      <div class="player-right">
+        <!-- Speed Chips -->
+        <div class="speed-control" title="Velocidade da fala">
+          <button class="speed-chip" data-speed="0.75">0.75x</button>
+          <button class="speed-chip active" data-speed="1.0">1.0x</button>
+          <button class="speed-chip" data-speed="1.25">1.25x</button>
+          <button class="speed-chip" data-speed="1.5">1.5x</button>
+          <button class="speed-chip" data-speed="2.0">2.0x</button>
+        </div>
+
+        <!-- pt-BR Voice Dropdown -->
+        <div class="voice-select-wrapper" title="Selecione a voz em Português do Brasil">
+          <select id="voice-select" class="voice-dropdown">
+            <option value="">Carregando vozes pt-BR...</option>
+          </select>
+        </div>
+
+        <!-- Page Navigation Buttons -->
+        <div class="page-jump-box">
+          <button id="btn-prev-page" class="ctrl-btn secondary" title="Página anterior">
+            <i data-lucide="chevron-left"></i>
+          </button>
+          <span>Pág.</span>
+          <input type="number" id="input-page-number" class="page-jump-input" min="1" value="1" />
+          <span id="label-total-pages">/ --</span>
+          <button id="btn-next-page" class="ctrl-btn secondary" title="Próxima página">
+            <i data-lucide="chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Drag & Drop Overlay -->
+    <div id="dropzone-overlay" class="dropzone-overlay">
+      <div class="dropzone-card">
+        <i data-lucide="file-up" style="width: 48px; height: 48px; color: var(--accent-primary);"></i>
+        <h3>Solte o arquivo PDF aqui</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem;">O documento será aberto imediatamente para leitura em voz alta.</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

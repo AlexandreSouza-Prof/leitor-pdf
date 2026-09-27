@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.agents/
+.temp_ag_kit/
+pdf_base/
+*.mp4
+*.log
+.DS_Store
