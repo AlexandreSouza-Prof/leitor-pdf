@@ -14,7 +14,6 @@
   "type": "module",
   "dependencies": {
     "lucide": "^1.48.0",
-    "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^6.3.289",
     "vite": "^8.3.1"
   }
